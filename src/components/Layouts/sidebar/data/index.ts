@@ -16,9 +16,21 @@ export const NAV_DATA = [
       },
       {
         title: "Posts",
-        url: "/posts",
         icon: Icons.Alphabet,
-        items: [],
+        items: [
+          {
+            title: "All Posts",
+            url: "/posts",
+          },
+          {
+            title: "Add Post",
+            url: "/posts/create",
+          },
+          {
+            title: "Categories",
+            url: "/posts/categories",
+          },
+        ],
       },
   {
         title: "Calendar",
