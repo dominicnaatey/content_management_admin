@@ -9,16 +9,23 @@ import {
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { LogOutIcon, SettingsIcon, UserIcon } from "./icons";
 
-export function UserInfo() {
+export function UserInfo({ user }: { user?: any }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleLogout = async () => {
+    await signOut({
+      callbackUrl: "/auth/sign-in",
+    });
+  };
+
   const USER = {
-    name: "John Smith",
-    email: "johnson@nextadmin.com",
-    img: "/images/user/user-03.png",
+    name: user?.name || "John Smith",
+    email: user?.email || "johnson@nextadmin.com",
+    img: user?.image || "/images/user/user-03.png",
   };
 
   return (
@@ -106,7 +113,7 @@ export function UserInfo() {
         <div className="p-2 text-base text-[#4B5563] dark:text-dark-6">
           <button
             className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[9px] hover:bg-gray-2 hover:text-dark dark:hover:bg-dark-3 dark:hover:text-white"
-            onClick={() => setIsOpen(false)}
+            onClick={handleLogout}
           >
             <LogOutIcon />
 

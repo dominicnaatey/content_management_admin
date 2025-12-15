@@ -9,7 +9,7 @@ import { Notification } from "./notification";
 import { ThemeToggleSwitch } from "./theme-toggle";
 import { UserInfo } from "./user-info";
 
-export function Header() {
+export function Header({ user }: { user?: any }) {
   const { toggleSidebar, isMobile } = useSidebarContext();
 
   return (
@@ -57,7 +57,7 @@ export function Header() {
         <Notification />
 
         <div className="shrink-0">
-          <UserInfo />
+          <UserInfo user={user} />
         </div>
       </div>
     </header>

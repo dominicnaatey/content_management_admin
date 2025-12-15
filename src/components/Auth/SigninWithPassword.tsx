@@ -4,8 +4,11 @@ import Link from "next/link";
 import React, { useState } from "react";
 import InputGroup from "../FormElements/InputGroup";
 import { Checkbox } from "../FormElements/checkbox";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function SigninWithPassword() {
+  const router = useRouter();
   const [data, setData] = useState({
     email: process.env.NEXT_PUBLIC_DEMO_USER_MAIL || "",
     password: process.env.NEXT_PUBLIC_DEMO_USER_PASS || "",
@@ -13,6 +16,7 @@ export default function SigninWithPassword() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({
@@ -21,15 +25,29 @@ export default function SigninWithPassword() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // You can remove this code block
     setLoading(true);
+    setError("");
 
-    setTimeout(() => {
+    try {
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid email or password");
+        setLoading(false);
+      } else {
+        router.push("/");
+        router.refresh();
+      }
+    } catch (error) {
+      setError("Something went wrong");
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -55,6 +73,12 @@ export default function SigninWithPassword() {
         value={data.password}
         icon={<PasswordIcon />}
       />
+
+      {error && (
+        <div className="mb-4 text-sm text-red-500">
+          {error}
+        </div>
+      )}
 
       <div className="mb-6 flex items-center justify-between gap-2 py-2 font-medium">
         <Checkbox
@@ -82,7 +106,8 @@ export default function SigninWithPassword() {
       <div className="mb-4.5">
         <button
           type="submit"
-          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
+          disabled={loading}
+          className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90 disabled:opacity-70"
         >
           Sign In
           {loading && (
