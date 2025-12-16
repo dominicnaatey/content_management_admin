@@ -89,11 +89,17 @@ export async function deletePost(id: string) {
   revalidatePath("/posts");
 }
 
-export async function updatePost(id: string, formData: FormData) {
+export async function updatePost(
+  id: string,
+  prevState: any,
+  formData: FormData
+) {
   const session = await auth();
 
   if (!session?.user) {
-    throw new Error("You must be signed in to update a post");
+    return {
+      error: "You must be signed in to update a post",
+    };
   }
 
   const validatedFields = PostSchema.safeParse({
@@ -110,12 +116,27 @@ export async function updatePost(id: string, formData: FormData) {
 
   const { title, content, published } = validatedFields.data;
 
+  const imageFile = formData.get("image") as File | null;
+  let imageUrl: string | undefined = undefined;
+
+  if (imageFile && imageFile.size > 0) {
+    try {
+      imageUrl = await uploadFile(imageFile, "posts");
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      return {
+        error: "Failed to upload image. Please try again.",
+      };
+    }
+  }
+
   await prisma.post.update({
     where: { id },
     data: {
       title,
       content,
       published,
+      ...(imageUrl && { image: imageUrl }),
     },
   });
 
