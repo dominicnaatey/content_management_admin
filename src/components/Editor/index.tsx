@@ -336,7 +336,7 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
                 </svg>
             </button>
             {showFormatDropdown && (
-                <div className="absolute z-50 mt-1 w-44 rounded divide-y divide-gray-100 shadow bg-white dark:bg-gray-700">
+                <div className="absolute z-50 mt-1 min-w-25 mb-4 rounded divide-y divide-gray-100 shadow bg-white dark:bg-gray-700 max-h-60 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
                         <li>
                             <button type="button" onClick={() => { editor.chain().focus().setParagraph().run(); setShowFormatDropdown(false); }} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Paragraph</button>
