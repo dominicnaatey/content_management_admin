@@ -4,6 +4,7 @@ import { createPost } from "@/actions/post-actions";
 import Editor from "@/components/Editor";
 import { Checkbox } from "@/components/FormElements/checkbox";
 import InputGroup from "@/components/FormElements/InputGroup";
+import { Alert } from "@/components/ui-elements/alert";
 import Image from "next/image";
 import { useActionState, useState, useEffect } from "react";
 
@@ -11,10 +12,13 @@ export function CreatePostForm() {
   const [state, action, isPending] = useActionState(createPost, undefined);
   const [preview, setPreview] = useState<string | null>(null);
   const [content, setContent] = useState("");
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   useEffect(() => {
     if (state && "success" in state && state.success) {
-      alert(state.message);
+      setShowSuccessAlert(true);
+      const timer = setTimeout(() => setShowSuccessAlert(false), 3000);
+      return () => clearTimeout(timer);
     }
   }, [state]);
 
@@ -29,6 +33,15 @@ export function CreatePostForm() {
 
   return (
     <form action={action}>
+      {showSuccessAlert && (
+        <div className="mb-4">
+          <Alert
+            variant="success"
+            title="Success"
+            description={state?.message || "Post created successfully"}
+          />
+        </div>
+      )}
       <InputGroup
         label="Title"
         name="title"

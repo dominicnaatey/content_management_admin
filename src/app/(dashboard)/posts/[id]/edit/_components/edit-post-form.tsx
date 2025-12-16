@@ -4,6 +4,7 @@ import { updatePost } from "@/actions/post-actions";
 import Editor from "@/components/Editor";
 import { Checkbox } from "@/components/FormElements/checkbox";
 import InputGroup from "@/components/FormElements/InputGroup";
+import { Alert } from "@/components/ui-elements/alert";
 import { Post } from "@/generated/client/client";
 import Image from "next/image";
 import { useActionState, useState, useEffect } from "react";
@@ -17,10 +18,13 @@ export function EditPostForm({ post }: EditPostFormProps) {
   const [state, action, isPending] = useActionState(updatePostWithId, undefined);
   const [preview, setPreview] = useState<string | null>(post.image);
   const [content, setContent] = useState(post.content || "");
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   useEffect(() => {
     if (state && "success" in state && state.success) {
-      alert(state.message);
+      setShowSuccessAlert(true);
+      const timer = setTimeout(() => setShowSuccessAlert(false), 3000);
+      return () => clearTimeout(timer);
     }
   }, [state]);
 
@@ -35,6 +39,15 @@ export function EditPostForm({ post }: EditPostFormProps) {
 
   return (
     <form action={action}>
+      {showSuccessAlert && (
+        <div className="mb-4">
+          <Alert
+            variant="success"
+            title="Success"
+            description={state?.message || "Post updated successfully"}
+          />
+        </div>
+      )}
       <InputGroup
         label="Title"
         name="title"
