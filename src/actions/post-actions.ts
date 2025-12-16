@@ -72,7 +72,7 @@ export async function createPost(prevState: any, formData: FormData) {
   });
 
   revalidatePath("/posts");
-  redirect("/posts");
+  return { success: true, message: "New post created" };
 }
 
 export async function deletePost(id: string) {
@@ -141,5 +141,6 @@ export async function updatePost(
   });
 
   revalidatePath("/posts");
-  redirect("/posts");
+  revalidatePath(`/posts/${id}/edit`);
+  return { success: true, message: "Post updated" };
 }

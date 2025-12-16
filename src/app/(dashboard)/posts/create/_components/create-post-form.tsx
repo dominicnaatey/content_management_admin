@@ -5,12 +5,18 @@ import Editor from "@/components/Editor";
 import { Checkbox } from "@/components/FormElements/checkbox";
 import InputGroup from "@/components/FormElements/InputGroup";
 import Image from "next/image";
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 
 export function CreatePostForm() {
   const [state, action, isPending] = useActionState(createPost, undefined);
   const [preview, setPreview] = useState<string | null>(null);
   const [content, setContent] = useState("");
+
+  useEffect(() => {
+    if (state && "success" in state && state.success) {
+      alert(state.message);
+    }
+  }, [state]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

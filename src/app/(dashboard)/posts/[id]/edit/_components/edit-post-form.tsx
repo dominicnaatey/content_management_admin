@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/FormElements/checkbox";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Post } from "@/generated/client/client";
 import Image from "next/image";
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 
 interface EditPostFormProps {
   post: Post;
@@ -17,6 +17,12 @@ export function EditPostForm({ post }: EditPostFormProps) {
   const [state, action, isPending] = useActionState(updatePostWithId, undefined);
   const [preview, setPreview] = useState<string | null>(post.image);
   const [content, setContent] = useState(post.content || "");
+
+  useEffect(() => {
+    if (state && "success" in state && state.success) {
+      alert(state.message);
+    }
+  }, [state]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
