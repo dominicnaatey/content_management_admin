@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { deletePost } from "@/actions/post-actions";
 import { prisma } from "@/lib/prisma";
+import Image from "next/image";
 
 export async function PostTable({ className }: { className?: string }) {
   const posts = await prisma.post.findMany({
@@ -47,10 +48,24 @@ export async function PostTable({ className }: { className?: string }) {
               className="text-center text-base font-medium text-dark dark:text-white"
             >
               <TableCell className="min-w-[155px] !text-left">
-                <h5 className="text-dark dark:text-white">{post.title}</h5>
-                <p className="mt-[3px] text-body-sm font-medium line-clamp-1">
-                  {post.content}
-                </p>
+                <div className="flex items-center gap-3">
+                  {post.image && (
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-md">
+                      <Image
+                        src={post.image}
+                        alt={post.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h5 className="text-dark dark:text-white">{post.title}</h5>
+                    <p className="mt-[3px] text-body-sm font-medium line-clamp-1">
+                      {post.content}
+                    </p>
+                  </div>
+                </div>
               </TableCell>
 
               <TableCell>

@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { uploadFile } from "@/lib/s3";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -36,6 +37,20 @@ export async function createPost(prevState: any, formData: FormData) {
 
   const { title, content, published } = validatedFields.data;
 
+  const imageFile = formData.get("image") as File | null;
+  let imageUrl: string | null = null;
+
+  if (imageFile && imageFile.size > 0) {
+    try {
+      imageUrl = await uploadFile(imageFile, "posts");
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      return {
+        error: "Failed to upload image. Please try again.",
+      };
+    }
+  }
+
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
   });
@@ -51,6 +66,7 @@ export async function createPost(prevState: any, formData: FormData) {
       title,
       content,
       published,
+      image: imageUrl,
       authorId: user.id,
     },
   });
