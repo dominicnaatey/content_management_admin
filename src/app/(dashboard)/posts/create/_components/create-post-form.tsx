@@ -3,10 +3,21 @@
 import { createPost } from "@/actions/post-actions";
 import { Checkbox } from "@/components/FormElements/checkbox";
 import InputGroup from "@/components/FormElements/InputGroup";
-import { useActionState } from "react";
+import Image from "next/image";
+import { useActionState, useState } from "react";
 
 export function CreatePostForm() {
   const [state, action, isPending] = useActionState(createPost, undefined);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+    } else {
+      setPreview(null);
+    }
+  };
 
   return (
     <form action={action}>
@@ -33,14 +44,27 @@ export function CreatePostForm() {
 
       <div className="mb-6">
         <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-          Cover Image
+          Featured Image
         </label>
         <input
           type="file"
           name="image"
           accept="image/*"
+          onChange={handleFileChange}
           className="w-full cursor-pointer rounded-lg border-[1.5px] border-stroke bg-transparent font-medium outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-whiter file:px-5 file:py-3 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-dark-3 dark:bg-dark-2 dark:file:border-dark-3 dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
         />
+        {preview && (
+          <div className="mt-4">
+            <div className="relative h-40 w-full overflow-hidden rounded-lg border border-stroke dark:border-dark-3">
+              <Image
+                src={preview}
+                alt="Preview"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mb-6">
