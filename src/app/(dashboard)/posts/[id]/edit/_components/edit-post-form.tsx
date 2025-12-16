@@ -19,6 +19,10 @@ export function EditPostForm({ post }: EditPostFormProps) {
   const [preview, setPreview] = useState<string | null>(post.image);
   const [content, setContent] = useState(post.content || "");
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [title, setTitle] = useState(post.title || "");
+  const [published, setPublished] = useState(post.published || false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [newImage, setNewImage] = useState<File | null>(null);
 
   useEffect(() => {
     if (state && "success" in state && state.success) {
@@ -29,12 +33,25 @@ export function EditPostForm({ post }: EditPostFormProps) {
     }
   }, [state]);
 
+  useEffect(() => {
+    const isTitleChanged = title !== post.title;
+    const isContentChanged = content !== (post.content || "");
+    const isPublishedChanged = published !== (post.published || false);
+    const isImageChanged = newImage !== null;
+
+    setHasChanges(
+      isTitleChanged || isContentChanged || isPublishedChanged || isImageChanged
+    );
+  }, [title, content, published, newImage, post]);
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setPreview(URL.createObjectURL(file));
+      setNewImage(file);
     } else {
       setPreview(post.image);
+      setNewImage(null);
     }
   };
 
@@ -62,6 +79,8 @@ export function EditPostForm({ post }: EditPostFormProps) {
               type="text"
               placeholder="Enter post title"
               defaultValue={post.title}
+              value={title}
+              handleChange={(e) => setTitle(e.target.value)}
               className="mb-4.5"
               required
             />
@@ -104,7 +123,8 @@ export function EditPostForm({ post }: EditPostFormProps) {
                 label="Publish immediately"
                 name="published"
                 withBg
-                defaultChecked={post.published}
+                checked={published}
+                onChange={(e) => setPublished(e.target.checked)}
               />
             </div>
 
@@ -113,8 +133,8 @@ export function EditPostForm({ post }: EditPostFormProps) {
             )}
 
             <button
-              disabled={isPending}
-              className="flex w-full justify-center rounded-lg bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 disabled:opacity-70"
+              disabled={isPending || !hasChanges}
+              className="flex w-full justify-center rounded-lg bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isPending ? "Updating..." : "Update Post"}
             </button>

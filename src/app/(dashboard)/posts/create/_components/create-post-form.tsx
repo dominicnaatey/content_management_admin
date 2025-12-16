@@ -14,7 +14,13 @@ export function CreatePostForm() {
   const [state, action, isPending] = useActionState(createPost, undefined);
   const [preview, setPreview] = useState<string | null>(null);
   const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
+  const [published, setPublished] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+  // Check if form has any data
+  const hasData = title.trim().length > 0 || content.trim().length > 0 || image !== null;
 
   useEffect(() => {
     if (state && "success" in state && state.success) {
@@ -29,8 +35,10 @@ export function CreatePostForm() {
     const file = event.target.files?.[0];
     if (file) {
       setPreview(URL.createObjectURL(file));
+      setImage(file);
     } else {
       setPreview(null);
+      setImage(null);
     }
   };
 
@@ -55,6 +63,8 @@ export function CreatePostForm() {
             placeholder="Enter post title"
             className="mb-4.5"
             required
+            value={title}
+            handleChange={(e) => setTitle(e.target.value)}
           />
 
           <div className="mb-6">
@@ -91,7 +101,13 @@ export function CreatePostForm() {
           </div>
 
           <div className="mb-6">
-            <Checkbox label="Publish immediately" name="published" withBg />
+            <Checkbox
+              label="Publish immediately"
+              name="published"
+              withBg
+              checked={published}
+              onChange={(e) => setPublished(e.target.checked)}
+            />
           </div>
 
           {state?.error && (
@@ -99,8 +115,8 @@ export function CreatePostForm() {
           )}
 
           <button
-            disabled={isPending}
-            className="flex w-full justify-center rounded-lg bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 disabled:opacity-70"
+            disabled={isPending || !hasData}
+            className="flex w-full justify-center rounded-lg bg-primary p-[13px] font-medium text-white hover:bg-opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isPending ? "Creating..." : "Create Post"}
           </button>
