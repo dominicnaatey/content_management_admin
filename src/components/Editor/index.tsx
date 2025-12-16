@@ -17,6 +17,30 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
   const [showFormatDropdown, setShowFormatDropdown] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const colorInputRef = useRef<HTMLInputElement>(null);
+  const formatDropdownRef = useRef<HTMLDivElement>(null);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        formatDropdownRef.current &&
+        !formatDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowFormatDropdown(false);
+      }
+      if (
+        colorPickerRef.current &&
+        !colorPickerRef.current.contains(event.target as Node)
+      ) {
+        setShowColorPicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const colors = [
     "#000000",
@@ -189,7 +213,7 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
           </svg>
         </Button>
         <Separator />
-        <div className="relative">
+        <div className="relative" ref={colorPickerRef}>
         <Button
           onClick={() => setShowColorPicker(!showColorPicker)}
           isActive={editor.isActive("textStyle", { color: /.*/ })}
@@ -292,7 +316,7 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
 
       {/* Row 2 */}
       <div className="flex flex-wrap items-center gap-1">
-        <div className="relative">
+        <div className="relative" ref={formatDropdownRef}>
             <button
                 type="button"
                 onClick={() => setShowFormatDropdown(!showFormatDropdown)}
