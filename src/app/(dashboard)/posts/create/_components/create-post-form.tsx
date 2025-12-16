@@ -19,6 +19,7 @@ export function CreatePostForm() {
   useEffect(() => {
     if (state && "success" in state && state.success) {
       setShowSuccessAlert(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       const timer = setTimeout(() => setShowSuccessAlert(false), 3000);
       return () => clearTimeout(timer);
     }
