@@ -12,10 +12,14 @@ import { FontFamily } from "@tiptap/extension-font-family";
 import TextAlign from "@tiptap/extension-text-align";
 import Youtube from "@tiptap/extension-youtube";
 import { useEffect, useState, useRef } from "react";
+import { MediaModal } from "./media-modal";
 
 const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
   const [showFormatDropdown, setShowFormatDropdown] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [mediaModalOpen, setMediaModalOpen] = useState(false);
+  const [mediaType, setMediaType] = useState<"image" | "video">("image");
+
   const colorInputRef = useRef<HTMLInputElement>(null);
   const formatDropdownRef = useRef<HTMLDivElement>(null);
   const colorPickerRef = useRef<HTMLDivElement>(null);
@@ -41,6 +45,35 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const handleMediaSave = (data: { type: "upload" | "link"; value: string | File }) => {
+    if (!editor) return;
+
+    if (mediaType === "image") {
+      if (data.type === "link") {
+        editor.chain().focus().setImage({ src: data.value as string }).run();
+      } else {
+        const file = data.value as File;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const src = e.target?.result as string;
+          editor.chain().focus().setImage({ src }).run();
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      // Video
+      if (data.type === "link") {
+        editor.commands.setYoutubeVideo({
+          src: data.value as string,
+          width: 640,
+          height: 480,
+        });
+      } else {
+         alert("Video upload is not fully supported in this demo without backend storage. Please use the Link option.");
+      }
+    }
+  };
 
   const colors = [
     "#000000",
@@ -83,23 +116,13 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
   };
 
   const addImage = () => {
-    const url = window.prompt("URL");
-
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
+    setMediaType("image");
+    setMediaModalOpen(true);
   };
 
   const addYoutube = () => {
-    const url = window.prompt("YouTube URL");
-
-    if (url) {
-      editor.commands.setYoutubeVideo({
-        src: url,
-        width: 640,
-        height: 480,
-      });
-    }
+    setMediaType("video");
+    setMediaModalOpen(true);
   };
 
   const Button = ({
@@ -410,6 +433,12 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
           </svg>
         </Button>
       </div>
+      <MediaModal
+        isOpen={mediaModalOpen}
+        onClose={() => setMediaModalOpen(false)}
+        onSave={handleMediaSave}
+        type={mediaType}
+      />
     </div>
   );
 };
