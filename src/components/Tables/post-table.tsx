@@ -1,4 +1,3 @@
-import { TrashIcon } from "@/assets/icons";
 import {
   Table,
   TableBody,
@@ -9,10 +8,10 @@ import {
 } from "../ui/table";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { deletePost } from "@/actions/post-actions";
 import { prisma } from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
+import { DeletePostButton } from "./delete-post-button";
 
 export async function PostTable({ className }: { className?: string }) {
   const posts = await prisma.post.findMany({
@@ -95,12 +94,7 @@ export async function PostTable({ className }: { className?: string }) {
 
                 <TableCell className="!text-right">
                   <div className="flex items-center justify-end gap-x-3.5">
-                    <form action={deletePost.bind(null, post.id)}>
-                      <button className="hover:text-primary">
-                        <span className="sr-only">Delete Post</span>
-                        <TrashIcon />
-                      </button>
-                    </form>
+                    <DeletePostButton id={post.id} />
                   </div>
                 </TableCell>
               </TableRow>
