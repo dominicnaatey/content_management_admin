@@ -9,9 +9,7 @@ export default function CreatePostPage() {
 
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
         <div className="flex flex-col gap-9">
-          <ShowcaseSection title="Post Details" className="!p-6.5">
-            <CreatePostForm />
-          </ShowcaseSection>
+          <CreatePostForm />
         </div>
       </div>
     </div>
