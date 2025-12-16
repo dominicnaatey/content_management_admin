@@ -377,6 +377,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("flowbite-typography")],
 };
 export default config;

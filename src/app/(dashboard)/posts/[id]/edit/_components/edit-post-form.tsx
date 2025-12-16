@@ -1,6 +1,7 @@
 "use client";
 
 import { updatePost } from "@/actions/post-actions";
+import Editor from "@/components/Editor";
 import { Checkbox } from "@/components/FormElements/checkbox";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Post } from "@/generated/client/client";
@@ -15,6 +16,7 @@ export function EditPostForm({ post }: EditPostFormProps) {
   const updatePostWithId = updatePost.bind(null, post.id);
   const [state, action, isPending] = useActionState(updatePostWithId, undefined);
   const [preview, setPreview] = useState<string | null>(post.image);
+  const [content, setContent] = useState(post.content || "");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -41,13 +43,8 @@ export function EditPostForm({ post }: EditPostFormProps) {
         <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
           Content
         </label>
-        <textarea
-          rows={6}
-          name="content"
-          placeholder="Enter post content"
-          defaultValue={post.content || ""}
-          className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-        />
+        <Editor value={content} onChange={setContent} />
+        <input type="hidden" name="content" value={content} />
       </div>
 
       <div className="mb-6">
