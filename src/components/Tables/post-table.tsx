@@ -33,6 +33,7 @@ export async function PostTable({ className }: { className?: string }) {
       <Table>
         <TableHeader>
           <TableRow className="border-none uppercase [&>th]:text-center">
+            <TableHead className="w-[50px] !text-left">#</TableHead>
             <TableHead className="min-w-[155px] !text-left">Title</TableHead>
             <TableHead>Author</TableHead>
             <TableHead>Date</TableHead>
@@ -42,11 +43,14 @@ export async function PostTable({ className }: { className?: string }) {
         </TableHeader>
 
         <TableBody>
-          {posts.map((post) => (
+          {posts.map((post, index) => (
             <TableRow
               key={post.id}
               className="text-center text-base font-medium text-dark dark:text-white"
             >
+              <TableCell className="!text-left text-dark dark:text-white">
+                {index + 1}
+              </TableCell>
               <TableCell className="min-w-[155px] !text-left">
                 <div className="flex items-center gap-3">
                   {post.image && (
