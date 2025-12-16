@@ -11,10 +11,25 @@ import { Color } from "@tiptap/extension-color";
 import { FontFamily } from "@tiptap/extension-font-family";
 import TextAlign from "@tiptap/extension-text-align";
 import Youtube from "@tiptap/extension-youtube";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
   const [showFormatDropdown, setShowFormatDropdown] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const colorInputRef = useRef<HTMLInputElement>(null);
+
+  const colors = [
+    "#000000",
+    "#4B5563",
+    "#9CA3AF",
+    "#DC2626",
+    "#D97706",
+    "#059669",
+    "#2563EB",
+    "#7C3AED",
+    "#DB2777",
+    "#FFFFFF",
+  ];
 
   if (!editor) {
     return null;
@@ -174,11 +189,9 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
           </svg>
         </Button>
         <Separator />
+        <div className="relative">
         <Button
-          onClick={() => {
-              const color = window.prompt("Color (hex or name)", "#000000");
-              if (color) editor.chain().focus().setColor(color).run();
-          }}
+          onClick={() => setShowColorPicker(!showColorPicker)}
           isActive={editor.isActive("textStyle", { color: /.*/ })}
           title="Text Color"
         >
@@ -187,6 +200,45 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
              <circle cx="17.5" cy="17.5" r="2.5" fill="currentColor" />
            </svg>
         </Button>
+        {showColorPicker && (
+          <div className="absolute top-full left-0 mt-2 z-50 w-32 rounded border border-stroke bg-white p-2 shadow-lg dark:border-strokedark dark:bg-gray-700">
+            <div className="grid grid-cols-5 gap-1">
+              {colors.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => {
+                    editor.chain().focus().setColor(color).run();
+                    setShowColorPicker(false);
+                  }}
+                  className={`h-5 w-5 rounded border border-gray-200 hover:scale-110 ${editor.isActive('textStyle', { color }) ? 'ring-1 ring-blue-500' : ''}`}
+                  style={{ backgroundColor: color }}
+                  title={color}
+                  type="button"
+                />
+              ))}
+            </div>
+            <div className="mt-2 border-t border-gray-200 pt-2 dark:border-gray-600">
+                <button
+                    type="button"
+                    onClick={() => {
+                        colorInputRef.current?.click();
+                        setShowColorPicker(false);
+                    }}
+                    className="w-full text-xs text-left hover:text-blue-500 dark:text-gray-300 dark:hover:text-white"
+                >
+                    Custom...
+                </button>
+            </div>
+          </div>
+        )}
+        <input
+          type="color"
+          ref={colorInputRef}
+          className="hidden"
+          onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+          value={editor.getAttributes('textStyle').color || '#000000'}
+        />
+        </div>
          <Button
           onClick={() => {
               const family = window.prompt("Font Family", "Arial");
@@ -242,6 +294,7 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
       <div className="flex flex-wrap items-center gap-1">
         <div className="relative">
             <button
+                type="button"
                 onClick={() => setShowFormatDropdown(!showFormatDropdown)}
                 className="flex items-center justify-between rounded px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-800 min-w-[100px]"
             >
@@ -259,14 +312,15 @@ const Toolbar = ({ editor }: { editor: TiptapEditor | null }) => {
                 </svg>
             </button>
             {showFormatDropdown && (
-                <div className="absolute z-10 mt-1 w-44 rounded divide-y divide-gray-100 shadow bg-white dark:bg-gray-700">
+                <div className="absolute z-50 mt-1 w-44 rounded divide-y divide-gray-100 shadow bg-white dark:bg-gray-700">
                     <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
                         <li>
-                            <button onClick={() => { editor.chain().focus().setParagraph().run(); setShowFormatDropdown(false); }} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Paragraph</button>
+                            <button type="button" onClick={() => { editor.chain().focus().setParagraph().run(); setShowFormatDropdown(false); }} className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Paragraph</button>
                         </li>
                         {[1, 2, 3, 4, 5, 6].map((level) => (
                              <li key={level}>
                                 <button
+                                    type="button"
                                     onClick={() => { editor.chain().focus().toggleHeading({ level: level as any }).run(); setShowFormatDropdown(false); }}
                                     className={`block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${editor.isActive('heading', { level }) ? 'bg-gray-100 dark:bg-gray-600' : ''}`}
                                 >
